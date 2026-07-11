@@ -246,13 +246,40 @@ _FLOATING_OBJECTS_HTML = '<div class="floating-objects">' + "".join(
     for icon, top, left, size, opacity, duration, delay, variant in _FLOATING_ICONS
 ) + "</div>"
 
+# Manual override (independent of the OS-level prefers-reduced-motion setting): lets the
+# user kill all motion for a specific context -- e.g. screen-sharing this during an
+# interview walkthrough -- without needing to change their OS accessibility settings.
+_STATIC_MODE_CSS = """
+<style>
+*, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+}
+.floating-objects { display: none !important; }
+</style>
+"""
+
 
 def inject_theme_css() -> None:
     """Injects the shared dark 'AI supply chain' theme (gradients, glow, glass cards,
-    subtle animation, floating background icons) once per page. Call at the top of every
-    page's script."""
+    subtle animation, floating background icons) once per page, plus a sidebar toggle to
+    kill all motion on demand. Call at the top of every page's script."""
     st.markdown(_THEME_CSS, unsafe_allow_html=True)
-    st.markdown(_FLOATING_OBJECTS_HTML, unsafe_allow_html=True)
+    # Streamlit's multipage nav resets a widget's *own* key-bound state when the widget is
+    # (re)created on a newly-visited page script, even though plain session_state survives
+    # navigation fine (verified directly) -- so persistence has to go through a plain
+    # variable we own, with the widget's key only used to read this run's interaction.
+    if "animated_theme" not in st.session_state:
+        st.session_state["animated_theme"] = True
+    animated = st.sidebar.toggle(
+        "Animated theme", value=st.session_state["animated_theme"], key="animated_theme_widget"
+    )
+    st.session_state["animated_theme"] = animated
+    if animated:
+        st.markdown(_FLOATING_OBJECTS_HTML, unsafe_allow_html=True)
+    else:
+        st.markdown(_STATIC_MODE_CSS, unsafe_allow_html=True)
 
 
 DARK_PLOTLY_COLORWAY = ["#22d3ee", "#5ed29c", "#f59e0b", "#a78bfa", "#f472b6", "#60a5fa", "#fb923c"]
