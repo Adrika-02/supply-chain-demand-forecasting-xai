@@ -111,6 +111,10 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 
 6-page Streamlit procurement planning dashboard, verified end-to-end against live data and the real production model (no hardcoded values). All screenshots below are from an actual local run.
 
+**Landing page** — dark, animated "AI supply chain" theme (glowing distribution-network hub, glass-panel KPI cards) carried consistently across all six pages:
+
+![Landing Page](reports/figures/dashboard/landing_hero.png)
+
 **Executive Overview** — network KPIs, interactive demand trend, store-format × month heatmap, top-10 stores, and a **live market signals** panel pulling real-time current weather (Open-Meteo API, no key required, refreshed every 15 minutes) for Rossmann's core German market — temperature and precipitation are established exogenous FMCG demand drivers, so this is a genuinely live external signal, not a simulated one (Rossmann's sales history stops in 2015 and has no live feed):
 
 ![Executive Overview](reports/figures/dashboard/executive_overview.png)

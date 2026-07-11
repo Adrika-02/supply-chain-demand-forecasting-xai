@@ -15,7 +15,7 @@ import plotly.express as px
 import shap
 import streamlit as st
 
-from dashboard.utils.helpers import load_features, load_json_report, load_model, store_list
+from dashboard.utils.helpers import inject_theme_css, load_features, load_json_report, load_model, store_list, style_fig
 from src.explainability.shap_explainer import (
     FEATURE_LABELS,
     explain_single_prediction,
@@ -24,6 +24,7 @@ from src.explainability.shap_explainer import (
 )
 
 st.set_page_config(page_title="SHAP Explainability", page_icon="📦", layout="wide")
+inject_theme_css()
 st.title("SHAP Explainability")
 st.caption("Built with shap.TreeExplainer on the production XGBoost model -- fully functional against live predictions.")
 
@@ -56,7 +57,7 @@ if importance:
         orientation="h",
         title="Top 15 Demand Drivers (Network-Wide)",
     )
-    st.plotly_chart(fig_imp, use_container_width=True)
+    st.plotly_chart(style_fig(fig_imp), use_container_width=True)
     st.caption(
         "Precomputed from a 5,000-row network sample (see reports/shap_feature_importance.json) "
         "rather than recomputed live, to keep the deployed app's memory footprint small."
@@ -78,10 +79,14 @@ with col2:
 shap_row, X_row, row_meta = explain_single_prediction(explainer, df, feature_cols, selected_store, str(selected_date))
 
 plt.close("all")
-shap.plots.waterfall(shap_row[0], show=False)
-fig = plt.gcf()
-fig.set_size_inches(10, fig.get_size_inches()[1] + 1)
-st.pyplot(fig, use_container_width=True)
+with plt.style.context("dark_background"):
+    shap.plots.waterfall(shap_row[0], show=False)
+    fig = plt.gcf()
+    fig.set_size_inches(10, fig.get_size_inches()[1] + 1)
+    fig.patch.set_facecolor("#0e1520")
+    for ax in fig.axes:
+        ax.set_facecolor("#0e1520")
+    st.pyplot(fig, use_container_width=True)
 plt.close("all")
 
 st.markdown("**Auto-generated business narrative:**")

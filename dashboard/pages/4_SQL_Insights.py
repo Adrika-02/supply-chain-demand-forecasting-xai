@@ -9,11 +9,12 @@ if str(ROOT_DIR) not in sys.path:
 import plotly.express as px
 import streamlit as st
 
-from dashboard.utils.helpers import load_json_report
+from dashboard.utils.helpers import inject_theme_css, load_json_report, style_fig
 from src.data.sql_queries import QUERY_LIBRARY
 from src.utils.db_utils import run_query
 
 st.set_page_config(page_title="SQL Insights", page_icon="📦", layout="wide")
+inject_theme_css()
 st.title("SQL Insights")
 st.caption("Pre-written SQL queries against `db/supply_chain.db`, run live -- not hardcoded results.")
 
@@ -37,7 +38,7 @@ fig_top = px.bar(
     title="Top 10 Stores by Total Demand",
 )
 fig_top.update_xaxes(type="category")
-st.plotly_chart(fig_top, use_container_width=True)
+st.plotly_chart(style_fig(fig_top), use_container_width=True)
 st.dataframe(top_stores, use_container_width=True, hide_index=True)
 
 st.divider()
@@ -69,4 +70,4 @@ fig_promo = px.bar(
     labels={"avg_daily_demand": "Avg Daily Demand", "period_type": ""},
     title="Promotional vs. Non-Promotional Average Daily Demand",
 )
-st.plotly_chart(fig_promo, use_container_width=True)
+st.plotly_chart(style_fig(fig_promo), use_container_width=True)

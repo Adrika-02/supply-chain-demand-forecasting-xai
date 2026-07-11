@@ -12,13 +12,16 @@ import streamlit as st
 from dashboard.utils.helpers import (
     fmt_currency,
     fmt_pct,
+    inject_theme_css,
     load_features,
     load_json_report,
     store_type_of,
+    style_fig,
 )
 from src.utils.live_data import fetch_live_weather
 
 st.set_page_config(page_title="Executive Overview", page_icon="📦", layout="wide")
+inject_theme_css()
 st.title("Executive Overview")
 
 df = load_features()
@@ -58,7 +61,7 @@ fig_trend = px.line(
     labels={"Sales": "Total Daily Demand (revenue-equivalent)"},
 )
 fig_trend.update_layout(hovermode="x unified")
-st.plotly_chart(fig_trend, use_container_width=True)
+st.plotly_chart(style_fig(fig_trend), use_container_width=True)
 
 st.divider()
 
@@ -81,7 +84,7 @@ with col_left:
         aspect="auto",
         color_continuous_scale="Teal",
     )
-    st.plotly_chart(fig_heat, use_container_width=True)
+    st.plotly_chart(style_fig(fig_heat), use_container_width=True)
 
 with col_right:
     st.subheader("Top 10 Stores by Total Demand")
@@ -95,7 +98,7 @@ with col_right:
     top10["Store"] = top10["Store"].astype(str)
     fig_top = px.bar(top10, x="Store", y="Sales", labels={"Sales": "Total Demand (revenue-equivalent)"})
     fig_top.update_xaxes(type="category")
-    st.plotly_chart(fig_top, use_container_width=True)
+    st.plotly_chart(style_fig(fig_top), use_container_width=True)
 
 st.divider()
 

@@ -10,11 +10,12 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from dashboard.utils.helpers import feature_columns, load_features, load_model, store_list
+from dashboard.utils.helpers import feature_columns, inject_theme_css, load_features, load_model, store_list, style_fig
 from src.models.config import get_cutoff_date
 from src.models.forecast import compute_residual_quantiles, forecast_store
 
 st.set_page_config(page_title="Demand Forecast", page_icon="📦", layout="wide")
+inject_theme_css()
 st.title("Demand Forecast")
 
 df = load_features()
@@ -66,12 +67,12 @@ view = hist_preds[mask]
 lo_q, hi_q = cached_residual_band(model, df)
 
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=view["Date"], y=view["Sales"], name="Actual", mode="lines", line=dict(color="#334155")))
-fig.add_trace(go.Scatter(x=view["Date"], y=view["Predicted"], name="Model Prediction", mode="lines", line=dict(color="#0E7C7B")))
+fig.add_trace(go.Scatter(x=view["Date"], y=view["Sales"], name="Actual", mode="lines", line=dict(color="#94a3b8")))
+fig.add_trace(go.Scatter(x=view["Date"], y=view["Predicted"], name="Model Prediction", mode="lines", line=dict(color="#22d3ee")))
 if cutoff >= pd.Timestamp(date_range[0]):
-    fig.add_vline(x=cutoff, line_dash="dash", line_color="gray", annotation_text="holdout starts")
+    fig.add_vline(x=cutoff, line_dash="dash", line_color="#64748b", annotation_text="holdout starts")
 fig.update_layout(hovermode="x unified", yaxis_title="Demand (revenue-equivalent)", legend=dict(orientation="h"))
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(style_fig(fig), use_container_width=True)
 st.caption(
     "Left of the dashed line is in-sample (model has seen this data during training); right of it is the "
     "holdout window used for the accuracy metrics reported elsewhere in this project."
@@ -98,21 +99,21 @@ forecast_df["Upper"] = forecast_df["PredictedSales"] + hi_q
 recent_actual = hist_preds.tail(30)
 
 fig2 = go.Figure()
-fig2.add_trace(go.Scatter(x=recent_actual["Date"], y=recent_actual["Sales"], name="Recent Actual", line=dict(color="#334155")))
+fig2.add_trace(go.Scatter(x=recent_actual["Date"], y=recent_actual["Sales"], name="Recent Actual", line=dict(color="#94a3b8")))
 fig2.add_trace(
     go.Scatter(
         x=pd.concat([forecast_df["Date"], forecast_df["Date"][::-1]]),
         y=pd.concat([forecast_df["Upper"], forecast_df["Lower"][::-1]]),
         fill="toself",
-        fillcolor="rgba(14,124,123,0.15)",
+        fillcolor="rgba(34,211,238,0.15)",
         line=dict(color="rgba(255,255,255,0)"),
         name="Empirical 10-90% interval",
         showlegend=True,
     )
 )
-fig2.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["PredictedSales"], name=f"{horizon}-Day Forecast", line=dict(color="#d97706")))
+fig2.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["PredictedSales"], name=f"{horizon}-Day Forecast", line=dict(color="#f59e0b")))
 fig2.update_layout(hovermode="x unified", yaxis_title="Demand (revenue-equivalent)", legend=dict(orientation="h"))
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(style_fig(fig2), use_container_width=True)
 st.caption(
     "Forecast is generated recursively (each day's prediction feeds the next day's lag/rolling features), "
     "the standard approach for multi-step tree-based forecasting. The confidence band is an empirical "

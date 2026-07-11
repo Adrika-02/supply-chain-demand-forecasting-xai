@@ -10,11 +10,12 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from dashboard.utils.helpers import assortment_of, load_features, load_model, store_type_of
+from dashboard.utils.helpers import assortment_of, inject_theme_css, load_features, load_model, store_type_of, style_fig
 from src.models.forecast import batch_forecast_all_stores
 from src.models.reorder import compute_reorder_point
 
 st.set_page_config(page_title="Procurement Recommendations", page_icon="📦", layout="wide")
+inject_theme_css()
 st.title("Procurement Recommendations")
 st.caption(
     "Reorder signal derived from a 7-day-ahead demand forecast vs. each store's recent 7-day demand rate. "
@@ -87,7 +88,7 @@ fig_dist = px.histogram(
     labels={"DeviationPct": "Forecast Deviation from Recent Rate (%)"},
     title="Network-Wide Demand Deviation Distribution",
 )
-st.plotly_chart(fig_dist, use_container_width=True)
+st.plotly_chart(style_fig(fig_dist), use_container_width=True)
 
 st.divider()
 st.subheader("Reorder Point / Safety Stock Calculator")

@@ -11,7 +11,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from dashboard.utils.helpers import load_json_report
+from dashboard.utils.helpers import inject_theme_css, load_json_report, style_fig
 from src.models.item_forecast import (
     batch_forecast_all_pairs,
     load_item_feature_frame,
@@ -21,6 +21,7 @@ from src.models.item_forecast import (
 from src.models.reorder import compute_reorder_point
 
 st.set_page_config(page_title="Product-Level Forecasting", page_icon="🏷️", layout="wide")
+inject_theme_css()
 st.title("Product-Level Forecasting (Store x Item)")
 st.caption(
     "Pages 1-5 use the Rossmann distribution network (1,115 stores, no SKU field -- Store doubles as "
@@ -94,10 +95,10 @@ pair_forecast = all_forecasts[(all_forecasts["Store"] == store) & (all_forecasts
 st.subheader(f"Store {store} / Item {item} -- {horizon}-Day Forward Forecast")
 fig_fc = go.Figure()
 recent = pair_df.tail(90)
-fig_fc.add_trace(go.Scatter(x=recent["Date"], y=recent["Sales"], name="Actual (last 90 days)", line=dict(color="steelblue")))
-fig_fc.add_trace(go.Scatter(x=pair_forecast["Date"], y=pair_forecast["PredictedSales"], name="Forecast", line=dict(color="firebrick", dash="dash")))
+fig_fc.add_trace(go.Scatter(x=recent["Date"], y=recent["Sales"], name="Actual (last 90 days)", line=dict(color="#94a3b8")))
+fig_fc.add_trace(go.Scatter(x=pair_forecast["Date"], y=pair_forecast["PredictedSales"], name="Forecast", line=dict(color="#f59e0b", dash="dash")))
 fig_fc.update_layout(xaxis_title="Date", yaxis_title="Units Sold / Day", hovermode="x unified")
-st.plotly_chart(fig_fc, use_container_width=True)
+st.plotly_chart(style_fig(fig_fc), use_container_width=True)
 
 st.divider()
 
@@ -128,7 +129,7 @@ with col_b:
         labels={"x": "Month", "y": "Avg Units Sold / Day"},
         title="Average Daily Demand by Month",
     )
-    st.plotly_chart(fig_month, use_container_width=True)
+    st.plotly_chart(style_fig(fig_month), use_container_width=True)
 
 st.divider()
 
