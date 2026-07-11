@@ -10,16 +10,14 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import shap
 import streamlit as st
 
-from dashboard.utils.helpers import load_features, load_model, store_list
+from dashboard.utils.helpers import load_features, load_json_report, load_model, store_list
 from src.explainability.shap_explainer import (
     FEATURE_LABELS,
-    compute_shap_values,
     explain_single_prediction,
     generate_local_narrative,
     generate_segment_narrative,
@@ -36,30 +34,35 @@ feature_cols = [c for c in df.columns if c not in DROP_COLS]
 
 
 @st.cache_resource
-def cached_explainer_and_sample(_model, _df, sample_size: int = 3000):
-    X = _df[feature_cols]
-    explainer, shap_values, X_sample = compute_shap_values(_model, X, sample_size=sample_size)
-    return explainer, shap_values, X_sample
+def cached_explainer(_model):
+    # No background sample needed: TreeExplainer reads XGBoost's tree
+    # structure directly, so this stays cheap regardless of network size --
+    # unlike caching a multi-thousand-row SHAP sample in memory.
+    return shap.TreeExplainer(_model)
 
 
-explainer, shap_values, X_sample = cached_explainer_and_sample(model, df)
+explainer = cached_explainer(model)
 
 st.subheader("Global Feature Importance")
-mean_abs = np.abs(shap_values.values).mean(axis=0)
-importance_df = pd.DataFrame(
-    {
-        "Feature": [FEATURE_LABELS.get(f, f) for f in feature_cols],
-        "Mean |SHAP value|": mean_abs,
-    }
-).sort_values("Mean |SHAP value|", ascending=True).tail(15)
-fig_imp = px.bar(
-    importance_df,
-    x="Mean |SHAP value|",
-    y="Feature",
-    orientation="h",
-    title="Top 15 Demand Drivers (Network-Wide)",
-)
-st.plotly_chart(fig_imp, use_container_width=True)
+importance = load_json_report("shap_feature_importance.json")
+if importance:
+    importance_df = pd.DataFrame(
+        {"Feature": list(importance.keys()), "Mean |SHAP value|": list(importance.values())}
+    ).tail(15)
+    fig_imp = px.bar(
+        importance_df,
+        x="Mean |SHAP value|",
+        y="Feature",
+        orientation="h",
+        title="Top 15 Demand Drivers (Network-Wide)",
+    )
+    st.plotly_chart(fig_imp, use_container_width=True)
+    st.caption(
+        "Precomputed from a 5,000-row network sample (see reports/shap_feature_importance.json) "
+        "rather than recomputed live, to keep the deployed app's memory footprint small."
+    )
+else:
+    st.info("Run `python -m src.explainability.shap_explainer` to generate the global importance report.")
 
 st.divider()
 st.subheader("Store-Level Explanation")
@@ -110,5 +113,6 @@ if st.button("Generate narrative"):
         1,
         segment_label,
         quarter=quarter,
+        sample_size=500,
     )
     st.success(segment_text)

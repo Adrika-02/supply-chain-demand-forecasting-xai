@@ -9,6 +9,7 @@ Provides:
     into procurement-planning language (e.g. "Promotions increased
     predicted demand by 34% for Store Type A in Q4")
 """
+import json
 from pathlib import Path
 
 import joblib
@@ -22,7 +23,8 @@ import shap
 
 MODELS_DIR = Path(__file__).resolve().parents[2] / "models"
 FEATURES_PATH = Path(__file__).resolve().parents[2] / "data" / "processed" / "features.parquet"
-FIGURES_DIR = Path(__file__).resolve().parents[2] / "reports" / "figures"
+REPORTS_DIR = Path(__file__).resolve().parents[2] / "reports"
+FIGURES_DIR = REPORTS_DIR / "figures"
 
 DROP_COLS = ["Date", "Sales"]
 
@@ -180,6 +182,21 @@ def generate_segment_narrative(
     return f"{label} {direction} predicted demand by {abs(pct):.1f}% for {segment_label}{quarter_label}."
 
 
+def save_global_importance(shap_values, feature_cols: list) -> Path:
+    """Persist mean(|SHAP|) per feature to JSON so the dashboard can render
+    the global importance chart without holding a multi-thousand-row SHAP
+    sample in memory at runtime (keeps the deployed app's memory footprint
+    small on Streamlit Cloud's free tier)."""
+    mean_abs = np.abs(shap_values.values).mean(axis=0)
+    importance = {
+        FEATURE_LABELS.get(f, f): float(v)
+        for f, v in sorted(zip(feature_cols, mean_abs), key=lambda x: x[1])
+    }
+    path = REPORTS_DIR / "shap_feature_importance.json"
+    path.write_text(json.dumps(importance, indent=2))
+    return path
+
+
 if __name__ == "__main__":
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     model, df, feature_cols = load_model_and_data()
@@ -188,6 +205,9 @@ if __name__ == "__main__":
     explainer, shap_values, X_sample = compute_shap_values(model, X)
     summary_path = plot_global_summary(shap_values, X_sample)
     print(f"Saved global summary plot to {summary_path}")
+
+    importance_path = save_global_importance(shap_values, feature_cols)
+    print(f"Saved global feature importance to {importance_path}")
 
     dep_paths, top_feats = plot_dependence_plots(shap_values, X_sample, feature_cols)
     print(f"Top 3 global drivers: {top_feats}")

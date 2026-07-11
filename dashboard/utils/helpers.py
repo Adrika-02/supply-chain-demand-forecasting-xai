@@ -15,15 +15,15 @@ DROP_COLS = ["Date", "Sales"]
 
 @st.cache_data
 def load_features() -> pd.DataFrame:
-    return pd.read_parquet(FEATURES_PATH)
-
-
-@st.cache_data
-def load_sales_enriched() -> pd.DataFrame:
-    from src.utils.db_utils import run_query
-
-    df = run_query("SELECT * FROM sales_enriched")
-    df["Date"] = pd.to_datetime(df["Date"])
+    # Downcast float64/int64 -> float32/smallest-int: roughly halves the
+    # ~850K-row table's memory footprint, which matters on Streamlit Cloud's
+    # free tier (1GB RAM). XGBoost predicts fine on float32 input.
+    df = pd.read_parquet(FEATURES_PATH)
+    float_cols = df.select_dtypes(include="float64").columns
+    df[float_cols] = df[float_cols].astype("float32")
+    int_cols = df.select_dtypes(include="int64").columns
+    for col in int_cols:
+        df[col] = pd.to_numeric(df[col], downcast="integer")
     return df
 
 
