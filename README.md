@@ -8,7 +8,9 @@
 [![SHAP](https://img.shields.io/badge/Explainability-SHAP-orange)]()
 [![License](https://img.shields.io/badge/License-MIT-lightgrey)]()
 
-**Live demo:** _TBD — added after Streamlit Cloud deployment_
+**Live demo:** https://supply-chain-demand-forecastingg.streamlit.app
+
+**Repository:** https://github.com/Adrika-02/supply-chain-demand-forecasting-xai
 
 ---
 
@@ -130,8 +132,8 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 ## 8. How to Run Locally
 
 ```bash
-git clone <repo-url>
-cd "Supply Chain Demand Forecasting"
+git clone https://github.com/Adrika-02/supply-chain-demand-forecasting-xai.git
+cd supply-chain-demand-forecasting-xai
 
 # Requires Python 3.10+. On macOS, XGBoost's OpenMP runtime (libomp) isn't
 # available without Homebrew -- a conda/Miniforge environment sidesteps this
