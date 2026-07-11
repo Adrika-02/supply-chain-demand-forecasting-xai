@@ -16,6 +16,7 @@ from dashboard.utils.helpers import (
     load_json_report,
     store_type_of,
 )
+from src.utils.live_data import fetch_live_weather
 
 st.set_page_config(page_title="Executive Overview", page_icon="📦", layout="wide")
 st.title("Executive Overview")
@@ -95,3 +96,30 @@ with col_right:
     fig_top = px.bar(top10, x="Store", y="Sales", labels={"Sales": "Total Demand (revenue-equivalent)"})
     fig_top.update_xaxes(type="category")
     st.plotly_chart(fig_top, use_container_width=True)
+
+st.divider()
+
+st.subheader("Live Market Signals")
+st.caption(
+    "Temperature and precipitation are established exogenous drivers of FMCG footfall and demand "
+    "(e.g., beverage/ice-cream demand rises with heat; foot traffic drops in heavy rain). Rossmann's "
+    "sales history stops in 2015 and carries no live feed, so this panel instead pulls genuinely live "
+    "current weather (Open-Meteo API, refreshed every 15 minutes) for Rossmann's core German market -- "
+    "the kind of real-time external signal a demand planner monitors alongside the model's forecast."
+)
+
+
+@st.cache_data(ttl=900)
+def cached_live_weather():
+    return fetch_live_weather()
+
+
+if st.button("Refresh live data now"):
+    cached_live_weather.clear()
+
+try:
+    weather_df = cached_live_weather()
+    st.dataframe(weather_df, use_container_width=True, hide_index=True)
+    st.caption("Observation times are reported live by Open-Meteo in the Europe/Berlin timezone.")
+except Exception as exc:
+    st.warning(f"Live weather feed temporarily unavailable: {exc}")

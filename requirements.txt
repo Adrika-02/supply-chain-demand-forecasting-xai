@@ -36,3 +36,6 @@ ipykernel>=6.29.0
 
 # Stats testing
 scipy>=1.11.0
+
+# Live external data (weather API)
+requests>=2.31.0

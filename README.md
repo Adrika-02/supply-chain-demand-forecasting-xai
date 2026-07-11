@@ -111,9 +111,11 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 
 5-page Streamlit procurement planning dashboard, verified end-to-end against live data and the real production model (no hardcoded values). All screenshots below are from an actual local run.
 
-**Executive Overview** — network KPIs, interactive demand trend, store-format × month heatmap, top-10 stores:
+**Executive Overview** — network KPIs, interactive demand trend, store-format × month heatmap, top-10 stores, and a **live market signals** panel pulling real-time current weather (Open-Meteo API, no key required, refreshed every 15 minutes) for Rossmann's core German market — temperature and precipitation are established exogenous FMCG demand drivers, so this is a genuinely live external signal, not a simulated one (Rossmann's sales history stops in 2015 and has no live feed):
 
 ![Executive Overview](reports/figures/dashboard/executive_overview.png)
+
+![Live Market Signals](reports/figures/dashboard/live_market_signals.png)
 
 **Demand Forecast** — forecast vs. actual with holdout boundary, recursive 30/60/90-day forward forecast with empirical confidence band and promo what-if toggle:
 
@@ -177,7 +179,7 @@ Supply Chain Demand Forecasting/
 │   │                            # reorder.py (safety-stock / reorder-point calculator)
 │   ├── explainability/        # shap_explainer.py (global/local/dependence/narratives)
 │   ├── eda.py                 # EDA + statistical significance tests
-│   └── utils/                  # business_metrics.py, db_utils.py
+│   └── utils/                  # business_metrics.py, db_utils.py, live_data.py (live weather API)
 ├── models/                # serialized (joblib) trained models (gitignored)
 ├── reports/
 │   ├── figures/             # saved EDA + SHAP plots + dashboard screenshots
