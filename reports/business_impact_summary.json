@@ -1,0 +1,30 @@
+{
+  "forecast_accuracy": {
+    "naive_seasonal_baseline_mae": 2400.0968451058075,
+    "naive_seasonal_baseline_rmse": 3038.9781563752776,
+    "naive_seasonal_baseline_mape": 37.23631286631617,
+    "xgboost_model_mape": 9.449846806581256,
+    "relative_mape_improvement_pct": 74.62195883757988,
+    "note": "Naive baseline = demand on the same weekday one week prior (SalesLag7), the fairest naive comparator given the strong weekly seasonality confirmed in EDA. Both scored on the identical holdout window (last 6 weeks, cutoff 2015-06-19)."
+  },
+  "network_scale": {
+    "current_store_count": 1115,
+    "target_store_count": 500,
+    "annual_revenue_run_rate_current_network": 2830901468.423102,
+    "annual_revenue_run_rate_target_network": 1269462541.8937676
+  },
+  "inventory_cost_savings": {
+    "assumptions": {
+      "inventory_to_sales_ratio": 0.1,
+      "overstock_reduction_range": [
+        0.2,
+        0.3
+      ],
+      "note": "Inventory-to-sales ratio and overstock-reduction range are published FMCG/retail supply-chain industry benchmarks, not derived from the Rossmann dataset (which has no inventory/cost fields). The annual revenue run-rate they're applied to IS derived from actual model/data output."
+    },
+    "estimated_inventory_value_at_target_scale": 126946254.18937677,
+    "estimated_annual_savings_low_20pct": 25389250.837875355,
+    "estimated_annual_savings_high_30pct": 38083876.25681303,
+    "estimated_annual_savings_base_25pct": 31736563.547344193
+  }
+}

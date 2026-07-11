@@ -1,0 +1,26 @@
+{
+  "seasonal_decomposition": {
+    "trend_start": 5279454.714285714,
+    "trend_end": 7648350.571428571,
+    "seasonal_amplitude": 8211204.711087421,
+    "residual_std": 1391359.1987880818
+  },
+  "promo_impact": {
+    "promo_mean": 8228.281239386994,
+    "non_promo_mean": 5929.407603487516,
+    "pct_lift": 38.77071352874008,
+    "t_statistic": 356.6357238880086,
+    "p_value": 0.0,
+    "cohens_d": 0.7965047406136166,
+    "significant_at_0.05": true
+  },
+  "holiday_effect": {
+    "holiday_mean": 8808.631868131868,
+    "regular_mean": 6953.515034108612,
+    "pct_diff": 26.67883545118513,
+    "t_statistic": 9.202952012522942,
+    "p_value": 2.331900816708231e-19,
+    "cohens_d": 0.5977268496487329,
+    "significant_at_0.05": true
+  }
+}

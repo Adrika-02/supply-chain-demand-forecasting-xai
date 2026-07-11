@@ -1,0 +1,38 @@
+# Core data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.18.0
+
+# Machine learning
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Time series
+statsmodels>=0.14.0
+prophet>=1.1.5
+
+# Explainability
+shap>=0.44.0
+
+# Database
+# sqlite3 is part of the Python standard library
+
+# Dashboard
+streamlit>=1.31.0
+
+# Model persistence
+joblib>=1.3.0
+
+# Parquet I/O
+pyarrow>=14.0.0
+
+# Notebook support
+jupyter>=1.0.0
+ipykernel>=6.29.0
+
+# Stats testing
+scipy>=1.11.0

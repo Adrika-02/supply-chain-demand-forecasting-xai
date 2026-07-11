@@ -1,0 +1,40 @@
+{
+  "selected_model": "XGBoost",
+  "reason": "XGBoost achieved the lowest global MAPE (9.45%) across all 1,115 distribution nodes on the holdout window, and scales to a single production model serving the full network -- unlike ARIMA/Prophet, which require one model per node.",
+  "global_metrics": {
+    "Random Forest": {
+      "MAE": 638.7363880605948,
+      "RMSE": 910.4314465531859,
+      "MAPE": 9.797057413693723
+    },
+    "XGBoost": {
+      "MAE": 616.1559903617297,
+      "RMSE": 881.0779898426284,
+      "MAPE": 9.449846806581256
+    }
+  },
+  "single_store_benchmark_store": 262,
+  "single_store_metrics": {
+    "ARIMA": {
+      "MAE": 1876.1572424770566,
+      "RMSE": 2243.312519739704,
+      "MAPE": 9.379176187095775
+    },
+    "Prophet": {
+      "MAE": 1697.6949813696122,
+      "RMSE": 2026.3297602326634,
+      "MAPE": 7.710158134578503
+    },
+    "Random Forest": {
+      "MAE": 1179.0870704852202,
+      "RMSE": 1487.2053790501752,
+      "MAPE": 5.352589019927353
+    },
+    "XGBoost": {
+      "MAE": 1212.1434865552326,
+      "RMSE": 1566.5298652067313,
+      "MAPE": 5.465194179110386
+    }
+  },
+  "test_holdout_start": "2015-06-19"
+}
