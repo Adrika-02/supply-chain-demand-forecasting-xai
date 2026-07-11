@@ -1,21 +1,22 @@
-# Data (raw Kaggle data should not be committed)
+# Raw Kaggle data should not be redistributed -- excluded from the repo.
+# Processed artifacts (SQLite db, feature table, production model) ARE
+# committed despite being derived data: Streamlit Cloud's free tier has no
+# persistent storage/database service and no way to run the Kaggle download +
+# full training pipeline at deploy time, so the dashboard ships with these
+# pre-built. Each is comfortably under GitHub's 100MB hard limit.
 data/raw/*
 !data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
 data/external/*
 !data/external/.gitkeep
 
-# Database
-db/*.sqlite
-db/*.db
-!db/.gitkeep
-
-# Trained models (large binaries)
+# Trained models (only the production model is committed; intermediate
+# comparison artifacts like random_forest_global.joblib are 500MB+ and stay
+# local-only)
 models/*.pkl
-models/*.joblib
 models/*.h5
+models/*.joblib
 !models/.gitkeep
+!models/best_model.joblib
 
 # Jupyter
 .ipynb_checkpoints/
