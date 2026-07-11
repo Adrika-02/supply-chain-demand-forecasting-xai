@@ -109,7 +109,7 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 
 ## 7. Dashboard
 
-5-page Streamlit procurement planning dashboard, verified end-to-end against live data and the real production model (no hardcoded values). All screenshots below are from an actual local run.
+6-page Streamlit procurement planning dashboard, verified end-to-end against live data and the real production model (no hardcoded values). All screenshots below are from an actual local run.
 
 **Executive Overview** — network KPIs, interactive demand trend, store-format × month heatmap, top-10 stores, and a **live market signals** panel pulling real-time current weather (Open-Meteo API, no key required, refreshed every 15 minutes) for Rossmann's core German market — temperature and precipitation are established exogenous FMCG demand drivers, so this is a genuinely live external signal, not a simulated one (Rossmann's sales history stops in 2015 and has no live feed):
 
@@ -130,6 +130,12 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 ![Procurement Recommendations](reports/figures/dashboard/procurement_recommendations.png)
 
 **SQL Insights** page (query library, promo ROI analysis) not pictured — see `dashboard/pages/4_SQL_Insights.py`.
+
+**Product Level Forecasting** — pages 1-5 run on the Rossmann network, which is store-level only (no SKU field: `Store` doubles as the demand-category proxy throughout). This page adds a second, genuinely SKU × location dataset — Kaggle's [Store Item Demand Forecasting Challenge](https://www.kaggle.com/competitions/demand-forecasting-kernels-only) (10 stores × 50 items, daily unit sales 2013–2017) — with its own trained XGBoost model (real holdout MAPE 12.87%), a store+item selector with a forward forecast, a **statistical seasonality test** (Kruskal-Wallis across calendar months, not a heuristic) that answers "is this product seasonal" with a real p-value, and the same reorder-point/safety-stock calculator producing physical-unit stocking recommendations for that specific product:
+
+![Product Level Forecasting](reports/figures/dashboard/product_level_forecasting.png)
+
+![Product Level Seasonality](reports/figures/dashboard/product_level_seasonality.png)
 
 ## 8. How to Run Locally
 
@@ -171,12 +177,16 @@ Supply Chain Demand Forecasting/
 ├── db/                    # SQLite database (gitignored)
 ├── notebooks/             # EDA, feature engineering, modeling, SHAP notebooks
 ├── src/
-│   ├── data/                # load_data.py (CSV -> SQLite), sql_queries.py (query library)
-│   ├── features/             # build_features.py (39 leakage-safe features)
+│   ├── data/                # load_data.py (CSV -> SQLite), load_item_data.py (2nd dataset),
+│   │                            # sql_queries.py (query library)
+│   ├── features/             # build_features.py (39 leakage-safe features),
+│   │                            # build_item_features.py (store x item grain)
 │   ├── models/                # config.py, train_arima/prophet/random_forest/xgboost.py,
 │   │                            # evaluate.py (comparison + best-model selection), forecast.py
 │   │                            # (recursive + vectorized batch multi-step forecasting),
-│   │                            # reorder.py (safety-stock / reorder-point calculator)
+│   │                            # reorder.py (safety-stock / reorder-point calculator),
+│   │                            # train_item_model.py + item_forecast.py (product-level model,
+│   │                            # forecasting, and seasonality test)
 │   ├── explainability/        # shap_explainer.py (global/local/dependence/narratives)
 │   ├── eda.py                 # EDA + statistical significance tests
 │   └── utils/                  # business_metrics.py, db_utils.py, live_data.py (live weather API)
@@ -187,7 +197,7 @@ Supply Chain Demand Forecasting/
 │   └── business_impact_summary.md
 ├── dashboard/
 │   ├── app.py               # Streamlit entry point / landing page
-│   ├── pages/                # 5-page multipage dashboard
+│   ├── pages/                # 6-page multipage dashboard
 │   └── utils/helpers.py       # shared caching, formatting, data loaders
 ├── tests/
 ├── requirements.txt

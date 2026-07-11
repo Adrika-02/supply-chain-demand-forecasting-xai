@@ -1,0 +1,11 @@
+{
+  "MAE": 5.866644382476807,
+  "RMSE": 7.59892015314653,
+  "MAPE": 12.868574460950896,
+  "test_days": 90,
+  "n_train_rows": 854000,
+  "n_test_rows": 45000,
+  "n_store_item_pairs": 500,
+  "n_stores": 10,
+  "n_items": 50
+}

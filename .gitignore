@@ -17,6 +17,7 @@ models/*.h5
 models/*.joblib
 !models/.gitkeep
 !models/best_model.joblib
+!models/item_xgboost.joblib
 
 # Jupyter
 .ipynb_checkpoints/

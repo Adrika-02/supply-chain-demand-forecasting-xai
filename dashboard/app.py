@@ -77,6 +77,7 @@ st.markdown(
 - **SHAP Explainability** -- global demand drivers, store-level "why", auto-generated narratives
 - **SQL Insights** -- pre-built SQL queries against the demand warehouse
 - **Procurement Recommendations** -- reorder suggestions, understock risk flags, downloadable report
+- **Product Level Forecasting** -- genuine SKU x store forecasting, seasonality testing, and reorder sizing on a second dataset (Kaggle Store Item Demand Forecasting Challenge)
 
 Use the sidebar to move between pages.
 """
