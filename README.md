@@ -123,7 +123,7 @@ Full breakdown in [`reports/business_impact_summary.md`](reports/business_impact
 
 ![SHAP Explainability](reports/figures/dashboard/shap_explainability.png)
 
-**Procurement Recommendations** — network-wide understock/overstock risk flags from a vectorized 7-day forecast across all 1,115 nodes, filterable table, downloadable CSV:
+**Procurement Recommendations** — network-wide understock/overstock risk flags from a vectorized 7-day forecast across all 1,115 nodes, filterable table, downloadable CSV, plus a **reorder-point / safety-stock calculator** (`Reorder Point = Avg Daily Demand × Lead Time + Z(service level) × Demand Std Dev × √Lead Time`) with configurable lead time and service level, and an optional unit-price input to convert the revenue-equivalent reorder point into physical units:
 
 ![Procurement Recommendations](reports/figures/dashboard/procurement_recommendations.png)
 
@@ -173,7 +173,8 @@ Supply Chain Demand Forecasting/
 │   ├── features/             # build_features.py (39 leakage-safe features)
 │   ├── models/                # config.py, train_arima/prophet/random_forest/xgboost.py,
 │   │                            # evaluate.py (comparison + best-model selection), forecast.py
-│   │                            # (recursive + vectorized batch multi-step forecasting)
+│   │                            # (recursive + vectorized batch multi-step forecasting),
+│   │                            # reorder.py (safety-stock / reorder-point calculator)
 │   ├── explainability/        # shap_explainer.py (global/local/dependence/narratives)
 │   ├── eda.py                 # EDA + statistical significance tests
 │   └── utils/                  # business_metrics.py, db_utils.py

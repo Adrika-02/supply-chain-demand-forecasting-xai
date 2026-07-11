@@ -12,6 +12,7 @@ import streamlit as st
 
 from dashboard.utils.helpers import assortment_of, load_features, load_model, store_type_of
 from src.models.forecast import batch_forecast_all_stores
+from src.models.reorder import compute_reorder_point
 
 st.set_page_config(page_title="Procurement Recommendations", page_icon="📦", layout="wide")
 st.title("Procurement Recommendations")
@@ -45,9 +46,9 @@ last_rows["Recent7DayRate"] = last_rows["RollingMean7"] * 7
 last_rows["StoreTypeLabel"] = last_rows.apply(store_type_of, axis=1)
 last_rows["AssortmentLabel"] = last_rows.apply(assortment_of, axis=1)
 
-rec = last_rows[["Store", "StoreTypeLabel", "AssortmentLabel", "Recent7DayRate"]].merge(
-    forecast_totals, on="Store"
-)
+rec = last_rows[
+    ["Store", "StoreTypeLabel", "AssortmentLabel", "Recent7DayRate", "RollingMean7", "RollingStd7"]
+].merge(forecast_totals, on="Store")
 rec["DeviationPct"] = (rec["Forecasted7Day"] - rec["Recent7DayRate"]) / rec["Recent7DayRate"] * 100
 
 
@@ -89,6 +90,48 @@ fig_dist = px.histogram(
 st.plotly_chart(fig_dist, use_container_width=True)
 
 st.divider()
+st.subheader("Reorder Point / Safety Stock Calculator")
+st.caption(
+    "Reorder Point = (Avg Daily Demand x Lead Time) + Safety Stock, where Safety Stock = "
+    "Z(service level) x Demand Std Dev x sqrt(Lead Time). Demand and its volatility come from each "
+    "store's own recent daily rate (RollingMean7 / RollingStd7) -- real, model-derived numbers. Lead "
+    "time and service level are configurable assumptions below (Rossmann has no real supplier lead-time "
+    "data). This is a *target stocking level* to cover lead-time demand at your chosen service level, "
+    "not \"how many more units to order right now\" -- that would additionally require real current "
+    "on-hand inventory, which doesn't exist in this dataset."
+)
+
+col_lt, col_sl, col_up = st.columns(3)
+with col_lt:
+    lead_time_days = st.number_input("Lead time (days)", min_value=1, max_value=60, value=7)
+with col_sl:
+    service_level_pct = st.select_slider(
+        "Target service level", options=[90, 95, 97, 99, 99.5], value=95, format_func=lambda x: f"{x}%"
+    )
+with col_up:
+    unit_price = st.number_input(
+        "Optional: unit price (to convert to physical units)",
+        min_value=0.0, value=0.0, step=0.5,
+        help="Rossmann has no real per-SKU price. Leave at 0 to keep the reorder point in "
+        "revenue-equivalent terms; enter a price to see it converted to physical units.",
+    )
+
+reorder = rec.apply(
+    lambda row: compute_reorder_point(
+        avg_daily_demand=row["RollingMean7"],
+        demand_std=row["RollingStd7"] if pd.notna(row["RollingStd7"]) else 0.0,
+        lead_time_days=lead_time_days,
+        service_level=service_level_pct / 100,
+        unit_price=unit_price if unit_price > 0 else None,
+    ),
+    axis=1,
+)
+rec["SafetyStock"] = reorder.apply(lambda r: r["safety_stock"])
+rec["ReorderPoint"] = reorder.apply(lambda r: r["reorder_point"])
+if unit_price > 0:
+    rec["ReorderPointUnits"] = reorder.apply(lambda r: r["reorder_point_units"])
+
+st.divider()
 st.subheader("Store-Level Recommendations")
 
 risk_filter = st.multiselect(
@@ -106,11 +149,16 @@ display_cols = {
     "DeviationPct": "Deviation %",
     "RiskFlag": "Risk Flag",
     "Recommendation": "Recommendation",
+    "SafetyStock": f"Safety Stock ({lead_time_days}d lead, {service_level_pct}% SL)",
+    "ReorderPoint": "Reorder Point",
 }
+if unit_price > 0:
+    display_cols["ReorderPointUnits"] = "Reorder Point (units)"
+
 display_df = filtered[list(display_cols.keys())].rename(columns=display_cols)
-display_df["Recent 7-Day Demand"] = display_df["Recent 7-Day Demand"].round(0)
-display_df["Forecasted 7-Day Demand"] = display_df["Forecasted 7-Day Demand"].round(0)
-display_df["Deviation %"] = display_df["Deviation %"].round(1)
+for col in display_df.columns:
+    if display_df[col].dtype.kind in "fc":
+        display_df[col] = display_df[col].round(1 if "%" in col else 0)
 
 st.dataframe(display_df, use_container_width=True, hide_index=True)
 
