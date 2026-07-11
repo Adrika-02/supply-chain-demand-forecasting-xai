@@ -10,7 +10,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from dashboard.utils.helpers import assortment_of, inject_theme_css, load_features, load_model, store_type_of, style_fig
+from dashboard.utils.helpers import assortment_of, inject_theme_css, load_features, load_model, store_type_label, style_fig
 from src.models.forecast import batch_forecast_all_stores
 from src.models.reorder import compute_reorder_point
 
@@ -44,7 +44,7 @@ forecast_totals = forecast_df.groupby("Store", as_index=False)["PredictedSales"]
 
 last_rows = df.sort_values("Date").groupby("Store").tail(1).copy()
 last_rows["Recent7DayRate"] = last_rows["RollingMean7"] * 7
-last_rows["StoreTypeLabel"] = last_rows.apply(store_type_of, axis=1)
+last_rows["StoreTypeLabel"] = last_rows.apply(store_type_label, axis=1)
 last_rows["AssortmentLabel"] = last_rows.apply(assortment_of, axis=1)
 
 rec = last_rows[

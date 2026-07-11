@@ -74,6 +74,23 @@ def store_type_of(row: pd.Series) -> str:
     return "Unknown"
 
 
+# Node counts and avg daily demand/store are real, computed from features.parquet (see
+# project history) -- Rossmann never discloses what A/B/C/D concretely represent, so
+# labels stick to what's actually measurable rather than inventing retail semantics
+# ("Hypermarket" etc.) that aren't in the source data.
+STORE_TYPE_LABELS = {
+    "A": "Format A — 602 nodes",
+    "B": "Format B — 17 nodes (high-volume)",
+    "C": "Format C — 148 nodes",
+    "D": "Format D — 348 nodes",
+    "Unknown": "Unknown",
+}
+
+
+def store_type_label(row: pd.Series) -> str:
+    return STORE_TYPE_LABELS.get(store_type_of(row), "Unknown")
+
+
 def assortment_of(row: pd.Series) -> str:
     for letter in ("a", "b", "c"):
         if row.get(f"Assortment_{letter}", 0) == 1:
@@ -94,10 +111,32 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
 .stApp {
     background:
-        radial-gradient(ellipse 900px 500px at 15% -10%, rgba(34,211,238,0.16), transparent 60%),
-        radial-gradient(ellipse 700px 500px at 90% 10%, rgba(94,210,156,0.12), transparent 60%),
+        radial-gradient(ellipse 900px 500px at 15% -10%, rgba(34,211,238,0.18), transparent 60%),
+        radial-gradient(ellipse 700px 550px at 92% 6%, rgba(94,210,156,0.13), transparent 60%),
+        radial-gradient(ellipse 900px 650px at 50% 115%, rgba(245,158,11,0.13), transparent 60%),
+        radial-gradient(ellipse 600px 450px at 4% 80%, rgba(96,165,250,0.10), transparent 60%),
         linear-gradient(180deg, #0a0e14 0%, #0a0e14 100%);
     background-attachment: fixed;
+}
+
+/* floating decorative supply-chain icons, drifting slowly behind all content */
+.floating-objects { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.floating-objects span {
+    position: absolute; display: block; line-height: 1;
+    filter: blur(0.4px) saturate(0.9);
+    animation-name: float-drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+@keyframes float-drift {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(22px, -34px) rotate(10deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes float-drift-alt {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(-26px, 28px) rotate(-8deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
 }
 
 /* faint animated network grid across the page */
@@ -177,10 +216,31 @@ hr { border-color: rgba(148,163,184,0.15) !important; }
 """
 
 
+_FLOATING_ICONS = [
+    # (icon, top%, left%, font-size px, opacity, duration s, delay s, keyframe variant)
+    ("📦", 8, 6, 44, 0.14, 20, 0, "float-drift"),
+    ("🚚", 18, 88, 50, 0.12, 24, 1.2, "float-drift-alt"),
+    ("🌐", 62, 92, 60, 0.10, 28, 0.4, "float-drift"),
+    ("✈️", 30, 78, 36, 0.13, 18, 2.0, "float-drift-alt"),
+    ("🚢", 78, 8, 46, 0.12, 26, 0.8, "float-drift"),
+    ("⚙️", 48, 3, 34, 0.11, 16, 1.6, "float-drift-alt"),
+    ("📈", 88, 82, 38, 0.13, 22, 0.6, "float-drift"),
+    ("🏭", 6, 45, 32, 0.09, 19, 1.0, "float-drift-alt"),
+]
+
+_FLOATING_OBJECTS_HTML = '<div class="floating-objects">' + "".join(
+    f'<span style="top:{top}%; left:{left}%; font-size:{size}px; opacity:{opacity}; '
+    f'animation-name:{variant}; animation-duration:{duration}s; animation-delay:{delay}s;">{icon}</span>'
+    for icon, top, left, size, opacity, duration, delay, variant in _FLOATING_ICONS
+) + "</div>"
+
+
 def inject_theme_css() -> None:
     """Injects the shared dark 'AI supply chain' theme (gradients, glow, glass cards,
-    subtle animation) once per page. Call at the top of every page's script."""
+    subtle animation, floating background icons) once per page. Call at the top of every
+    page's script."""
     st.markdown(_THEME_CSS, unsafe_allow_html=True)
+    st.markdown(_FLOATING_OBJECTS_HTML, unsafe_allow_html=True)
 
 
 DARK_PLOTLY_COLORWAY = ["#22d3ee", "#5ed29c", "#f59e0b", "#a78bfa", "#f472b6", "#60a5fa", "#fb923c"]

@@ -15,7 +15,7 @@ import plotly.express as px
 import shap
 import streamlit as st
 
-from dashboard.utils.helpers import inject_theme_css, load_features, load_json_report, load_model, store_list, style_fig
+from dashboard.utils.helpers import STORE_TYPE_LABELS, inject_theme_css, load_features, load_json_report, load_model, store_list, style_fig
 from src.explainability.shap_explainer import (
     FEATURE_LABELS,
     explain_single_prediction,
@@ -99,7 +99,12 @@ st.subheader("Segment Narrative")
 st.caption("Aggregate SHAP contribution of a chosen feature, averaged across a store-format x quarter segment.")
 
 col3, col4, col5 = st.columns(3)
-store_type_options = {"Store Type A": "StoreType_a", "Store Type B": "StoreType_b", "Store Type C": "StoreType_c", "Store Type D": "StoreType_d"}
+store_type_options = {
+    STORE_TYPE_LABELS["A"]: "StoreType_a",
+    STORE_TYPE_LABELS["B"]: "StoreType_b",
+    STORE_TYPE_LABELS["C"]: "StoreType_c",
+    STORE_TYPE_LABELS["D"]: "StoreType_d",
+}
 feature_options = {FEATURE_LABELS.get(f, f): f for f in feature_cols}
 with col3:
     segment_label = st.selectbox("Store format segment", list(store_type_options.keys()))

@@ -15,7 +15,7 @@ from dashboard.utils.helpers import (
     inject_theme_css,
     load_features,
     load_json_report,
-    store_type_of,
+    store_type_label,
     style_fig,
 )
 from src.utils.live_data import fetch_live_weather
@@ -28,7 +28,7 @@ df = load_features()
 impact = load_json_report("business_impact_summary.json")
 best_model = load_json_report("best_model_selection.json")
 
-df["StoreTypeLabel"] = df.apply(store_type_of, axis=1)
+df["StoreTypeLabel"] = df.apply(store_type_label, axis=1)
 
 st.subheader("Key Performance Indicators")
 col1, col2, col3, col4 = st.columns(4)
