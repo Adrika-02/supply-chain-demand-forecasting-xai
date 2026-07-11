@@ -212,6 +212,18 @@ h1 { text-shadow: 0 0 24px rgba(34,211,238,0.25); }
 [data-testid="stDataFrame"] { border-radius: 12px; overflow: hidden; border: 1px solid rgba(148,163,184,0.12); }
 
 hr { border-color: rgba(148,163,184,0.15) !important; }
+
+/* respect the OS-level "reduce motion" setting: neutralize every animation/transition
+   defined here or in the hero markup, and drop the purely-decorative floating icons,
+   rather than forcing continuous motion on users who've explicitly opted out of it */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+    .floating-objects { display: none; }
+}
 </style>
 """
 

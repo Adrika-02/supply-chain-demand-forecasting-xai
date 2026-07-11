@@ -83,8 +83,10 @@ with col2:
 with col3:
     st.metric("On Track", int(counts.get("On Track", 0)))
 
+RISK_COLOR_MAP = {"On Track": "#5ed29c", "Understock Risk": "#f59e0b", "Overstock Risk": "#f472b6"}
 fig_dist = px.histogram(
     rec, x="DeviationPct", color="RiskFlag", nbins=50,
+    color_discrete_map=RISK_COLOR_MAP,
     labels={"DeviationPct": "Forecast Deviation from Recent Rate (%)"},
     title="Network-Wide Demand Deviation Distribution",
 )

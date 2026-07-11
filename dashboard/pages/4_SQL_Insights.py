@@ -9,7 +9,7 @@ if str(ROOT_DIR) not in sys.path:
 import plotly.express as px
 import streamlit as st
 
-from dashboard.utils.helpers import inject_theme_css, load_json_report, style_fig
+from dashboard.utils.helpers import DARK_PLOTLY_COLORWAY, inject_theme_css, load_json_report, style_fig
 from src.data.sql_queries import QUERY_LIBRARY
 from src.utils.db_utils import run_query
 
@@ -34,6 +34,7 @@ fig_top = px.bar(
     x="Store",
     y="total_demand",
     color="StoreType",
+    color_discrete_sequence=DARK_PLOTLY_COLORWAY,
     labels={"total_demand": "Total Demand (revenue-equivalent)"},
     title="Top 10 Stores by Total Demand",
 )
@@ -67,6 +68,7 @@ fig_promo = px.bar(
     x="period_type",
     y="avg_daily_demand",
     color="period_type",
+    color_discrete_sequence=DARK_PLOTLY_COLORWAY,
     labels={"avg_daily_demand": "Avg Daily Demand", "period_type": ""},
     title="Promotional vs. Non-Promotional Average Daily Demand",
 )
