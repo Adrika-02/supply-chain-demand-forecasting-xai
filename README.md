@@ -215,4 +215,6 @@ Supply Chain Demand Forecasting/
 _All numbers below are sourced directly from this project's actual model output and reports (`reports/model_comparison_global.json`, `reports/business_impact_summary.json`) — not placeholders._
 
 - Engineered an end-to-end demand forecasting pipeline for a 1,115-node FMCG distribution network (1M+ SQLite-warehoused records, 39 leakage-safe features), benchmarking ARIMA (SARIMAX), Prophet, Random Forest, and XGBoost; selected XGBoost for production after cutting forecast error 74.6% vs. a naive seasonal baseline (MAPE 37.2% → 9.45%) across the full network.
-- Built SHAP-based explainability (global driver analysis, live per-store waterfall explanations, auto-generated business narratives) into a 5-page Streamlit Cloud dashboard with recursive multi-step forecasting and what-if promo scenario planning, translating model output into procurement actions projected to save an estimated €25–38M annually in inventory costs at a 500-store scale.
+- Built SHAP-based explainability (global driver analysis, live per-store waterfall explanations, auto-generated business narratives) and a reorder-point/safety-stock calculator into a 6-page Streamlit Cloud dashboard — including a genuine SKU × store product-level forecasting module (second dataset, Kruskal-Wallis seasonality testing) — translating model output into procurement actions projected to save an estimated €25–38M annually in inventory costs at a 500-store scale.
+
+---
