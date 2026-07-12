@@ -1,6 +1,6 @@
 # Core data manipulation
 pandas>=2.0.0
-numpy>=1.24.0
+numpy==2.2.6
 
 # Visualization
 matplotlib>=3.7.0
@@ -8,15 +8,21 @@ seaborn>=0.12.0
 plotly>=5.18.0
 
 # Machine learning
-scikit-learn>=1.3.0
-xgboost>=2.0.0
+scikit-learn==1.7.2
+# Exact-pinned (not >=): shap's Booster parsing has a documented, previously-hit
+# incompatibility with newer xgboost releases (e.g. xgboost 3.x's changed base_score
+# serialization format breaks shap.TreeExplainer). An unpinned bound lets a fresh
+# Streamlit Cloud rebuild silently drift onto a newer, untested xgboost/shap pair and
+# crash (segfault, not even a catchable Python exception) -- pin to the pair actually
+# verified working together.
+xgboost==2.1.4
 
 # Time series
 statsmodels>=0.14.0
 prophet>=1.1.5
 
 # Explainability
-shap>=0.44.0
+shap==0.49.1
 
 # Database
 # sqlite3 is part of the Python standard library
